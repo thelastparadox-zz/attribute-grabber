@@ -1,14 +1,15 @@
 version: '2'
 services:
   web:
-    image: php:7.1.11-apache
+    build: ./docker/
+    image: php-apache-custom
     container_name: php
     restart: always
     ports:
     - "8000:80"
     - "8443:443"
     volumes:
-     - /webdev/attribute-grabber:/var/www/html 
+     - /webdev/attribute-grabber:/var/www/html
   # MYSQL
   mysqldb:
     image: mysql:latest

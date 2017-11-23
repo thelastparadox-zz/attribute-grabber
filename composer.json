@@ -6,9 +6,19 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "bunny/bunny": "^0.2.4",
+        "fabpot/goutte": "^3.2",
         "fideloper/proxy": "~3.3",
+        "jakoch/phantomjs-installer": "^2.1",
+        "jonnyw/php-phantomjs": "^4.6",
         "laravel/framework": "5.5.*",
-        "laravel/tinker": "~1.0"
+        "laravel/tinker": "~1.0",
+        "laravelcollective/html": "^5.5",
+        "paquettg/php-html-parser": "^1.7",
+        "php-amqplib/php-amqplib": "^2.7",
+        "phpoffice/phpspreadsheet": "dev-develop",
+        "ressio/pharse": "^0.2.0",
+        "symfony/css-selector": "^3.3"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
@@ -46,11 +56,18 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover"
+        ],
+        "post-install-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ],
+        "post-update-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
         ]
     },
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "bin-dir": "bin"
     }
 }

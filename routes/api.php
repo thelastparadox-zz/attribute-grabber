@@ -16,3 +16,11 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('api')->get('/refresh_category/{category_id}', 'CategoriesController@refresh_category');
+
+Route::middleware('api')->get('/get_queue_stats', 'CrawlersController@get_queue_stats');
+
+Route::middleware('api')->post('/load_template', 'JSTemplateController@load_template');
+
+Route::middleware('api')->get('/crawler-queue/get', 'CrawlerApiController@queue_get');

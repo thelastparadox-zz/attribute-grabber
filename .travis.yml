@@ -1,0 +1,23 @@
+# Attribute-Grabber Travis File
+
+language: php
+
+os:
+  - linux
+
+env:
+  - DB=mysql
+
+install:
+  # Install composer packages, will also trigger dump-autoload
+  - sudo apt-get install php-bcmath
+  - travis_retry composer install --no-interaction
+  - npm install
+
+before_script:  
+  # Composer update
+  - composer update
+
+# Copy PhantomJS over to the code bin directory
+# sudo cp /usr/bin/phantomjs /var/www/html/attribute-grabber/bin/phantomjs
+

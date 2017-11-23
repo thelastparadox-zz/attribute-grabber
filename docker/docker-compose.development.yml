@@ -1,0 +1,23 @@
+version: '2'
+services:
+# Web Dev server use local storage so we can edit files on the fly
+    web:
+        volumes:
+            - /webdev/attribute-grabber:/var/www/html
+# PhpMyAdmin
+    myadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        ports:
+            - "8080:80"
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=${MYSQL_HOST}
+        restart: always
+        depends_on:
+            - mysqldb
+    portainer:
+        image: portainer/portainer
+        container_name: portainer
+        ports:
+            - "9000:9000"

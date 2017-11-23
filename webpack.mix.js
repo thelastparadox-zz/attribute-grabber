@@ -12,4 +12,6 @@ let mix = require('laravel-mix');
  */
 
 mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+   .sass('resources/assets/sass/app.scss', 'public/css')
+   .sass('node_modules/gentelella/src/scss/custom.scss', 'public/css')
+   .sass('node_modules/gentelella/vendors/iCheck/skins/flat/green.css', 'public/css');

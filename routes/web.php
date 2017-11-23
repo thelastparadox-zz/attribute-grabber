@@ -12,5 +12,21 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('upload');
 });
+
+Route::get('sites', 'SitesController@sites_home');
+
+Route::get('crawlers', 'CrawlersController@crawlers_home');
+
+Route::post('add_categories', 'CategoriesController@process_upload');
+
+Route::get('categories', 'CategoriesController@view_categories');
+
+Route::get('grab_categories', 'CategoriesController@grab_categories');
+
+Route::get('test_crawler', 'CrawlersController@test_crawler');
+
+Route::get('crawler_test_specific_page', 'CrawlersController@crawler_test_specific_page');
+
+Route::get('process_crawler_queue', 'CrawlersController@process_crawler_queue');

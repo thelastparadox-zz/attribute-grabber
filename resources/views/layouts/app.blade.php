@@ -88,6 +88,7 @@
                       @section('site_list') @show
                     </ul>
                   </li> 
+                  <li><a href="/crawlers"><i class="fa fa-home"></i> Crawlers <span class="fa fa-chevron-down"></span></a></li> 
                 </ul>
               </div>
             </div>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Set some basic project information and targets -->
+<project name="Subspace Build Script" default="build" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+<target name="build" depends="clean, prepare, composer.install, lint, phpunit"/>
+<target name="build-dev" depends="clean, prepare, composer-selfupdate, composer.install, dbupdate, lint, phpunit"/>
+<target name="build-travis" depends="clean, prepare, travis-config, composer-selfupdate, composer.install, dbcreate, dbupdate, importtestdata"/>
+<target name="test" depends="lint, phpunit"/>
+
+<property environment="env"/>
+<property name="location.vendor" value="${basedir}/vendor"/>
+<property name="location.vendor.bin" value="${basedir}/vendor/bin"/>
+<property name="location.composer" value="${basedir}/vendor/bin/composer.phar"/>
+<property name="location.build" value="${basedir}/build"/>
+<property name="location.build.phpunit" value="${basedir}/build/phpunit"/>
+
+<!-- Begin file checks -->
+<target name="git-pull">
+   <echo message="Initiating Git pull of latest code............. [STARTED]" />
+   <exec executable="git">
+    <arg value="pull"/>
+   </exec>
+   <echo message="Git pull complete.............................. [COMPLETE]" />
+</target>
+
+<!-- Clean up from previous builds -->
+ <target name="clean" description="Cleanup build artifacts">
+  <echo message="Clean-up of previous build artefacts .......... [STARTED]" />
+  <delete dir="${location.build.phpunit}"/>
+  <echo message="PHPUnit Directory deleted ..................... [OK]" />
+  <echo message="Clean-up of previous build artefacts .......... [COMPLETE]" />
+ </target>
+
+<!-- Prepare for the new build --> 
+ <target name="prepare" description="Prepare for build">
+  <echo message="Preparing for new build artefacts ............. " />
+
+  <!-- Check Vendor Directory exists --> 
+  <condition property="location.vendor.exists">
+    <resourceexists>
+      <file file="${location.vendor}"/>
+    </resourceexists>
+  </condition>
+  <mkdir dir="${location.vendor}" unless:true="${location.vendor.exists} "/>
+  <echo message="Vendor directory created ...................... [OK]" unless:true="${location.vendor.exists}" />
+  <echo message="Vendor directory already exists ............... [OK]" if:true="${location.vendor.exists}" /> 
+
+  <!-- Check Vendor Bin Directory exists --> 
+  <condition property="location.vendor.bin.exists">
+    <resourceexists>
+      <file file="${location.vendor.bin}"/>
+    </resourceexists>
+  </condition>
+  <mkdir dir="${location.vendor.bin}" unless:true="${location.vendor.bin.exists} "/>
+  <echo message="Vendor Bin directory created .................. [OK]" unless:true="${location.vendor.bin.exists}" />  
+  <echo message="Vendor Bin directory already exists ........... [OK]" if:true="${location.vendor.bin.exists}" /> 
+
+  <!-- Check Build Directory exists --> 
+  <condition property="location.build.exists">
+    <resourceexists>
+      <file file="${location.build}"/>
+    </resourceexists>
+  </condition>
+  <mkdir dir="${location.build}" unless:true="${location.build.exists} "/>
+  <echo message="Build directory created ....................... [OK]" unless:true="${location.build.exists}" />  
+  <echo message="Build directory already exists ................ [OK]" if:true="${location.build.exists}" /> 
+
+  <!-- Check Build Directory exists --> 
+  <condition property="location.build.phpunit.exists">
+    <resourceexists>
+      <file file="${location.build.phpunit}"/>
+    </resourceexists>
+  </condition>
+  <mkdir dir="${location.build.phpunit}" unless:true="${location.build.phpunit.exists} "/>
+  <echo message="PHPUnit directory created ..................... [OK]" unless:true="${location.build.phpunit.exists}" />  
+  <echo message="PHPUnit directory already exists .............. [OK]" if:true="${location.build.phpunit.exists}" /> 
+
+  <!-- Check to see if Composer is already installed --> 
+  <condition property="composer.exists">
+    <resourceexists>
+      <file file="${location.composer}"/>
+    </resourceexists>
+  </condition>
+  <echo message="Composer is already present.................... [OK]" if:true="${composer.exists}" />
+  <echo message="Composer is not present, setting download...... [FAIL]" unless:true="${composer.exists}" />
+
+  <!-- Download Composer -->
+  <get src="https://getcomposer.org/composer.phar" dest="${location.composer}" unless:true="${composer.exists}"/>
+  <echo message="Downloaded Composer ........................... [OK]" unless:true="${composer.exists}" />
+ </target>
+
+<!-- Copy Travis Config -->
+<target name="travis-config">
+  <echo message="Copying travis config file over to the ........ [STARTED]" />
+  <copy file="app/config/parameters.yml.travis" tofile="app/config/parameters.yml"/>
+  <echo message="Copy complete.................................. [COMPLETE]" />
+</target>
+  
+<target name="composer-selfupdate">
+  <echo message="Updating Composer ............................. [STARTED]" />
+  <exec executable="php">
+    <arg value="${location.composer}"/>
+    <arg value="self-update"/>
+  </exec>
+  <echo message="Updating Composer ............................. [COMPLETE]" />
+</target>
+
+<target name="composer.install" description="Run composer install">
+  <echo message="Running Composer .............................. [STARTED]" />
+  <exec executable="php">
+    <arg value="-dmemory_limit=1G"/>
+    <arg value="${location.composer}"/>
+    <arg value="install"/>
+  </exec>
+  <echo message="Running Composer .............................. [COMPLETE]" />
+</target>
+
+<target name="composer.update" description="Run composer update">
+  <echo message="Running Composer .............................. [STARTED]" />
+  <exec executable="php">
+    <arg value="-dmemory_limit=1G"/>
+    <arg value="${location.composer}"/>
+    <arg value="update"/>
+  </exec>
+  <echo message="Running Composer .............................. [COMPLETE]" />
+</target>
+
+<!-- Run any DB schema updates --> 
+<target name="dbcreate" description="Create Database and Schema">
+  <echo message="Creating Database ............................. [STARTED]" />
+  <exec executable="php" failonerror="true">
+    <arg value='artisan' />
+      <arg value="doctrine:database:create" />
+  </exec>
+  <echo message="Creating Database ............................. [COMPLETE]" />
+</target>
+
+<!-- Run any DB schema updates --> 
+<target name="dbupdate" description="Update Schema">
+  <echo message="Updating Database ............................. [STARTED]" />
+  <exec executable="php" failonerror="true">
+    <arg value='bin/console' />
+      <arg value="doctrine:schema:update" />
+      <arg value='--force' />
+  </exec>
+  <echo message="Updating Database ............................. [COMPLETE]" />
+</target>
+
+<!-- Import Test Data --> 
+<target name="importtestdata" description="Import Test Data Fixtures">
+  <echo message="Adding test data to Database .................. [STARTED]" />
+  <exec executable="php" failonerror="true">
+    <arg value='bin/console' />
+      <arg value="doctrine:fixtures:load" />
+      <arg value='--no-interaction' />
+  </exec>
+  <echo message="Adding test data to Database .................. [COMPLETE]" />
+</target>
+
+<!-- Lint the PHP files in app dir. Linting the whole framework library takes forever -->
+ <target name="lint" description="Perform syntax check of sourcecode files">
+  <apply executable="php" failonerror="true">
+   <arg value="-l" />  
+    <fileset dir="${basedir}/app">
+      <include name="**/*.php" />
+    <modified />
+   </fileset>
+  </apply>
+ </target>
+ 
+<!-- PHP Code Sniffer - tokenises PHP, JS and CSS files and detects violations of defined coding standards --> 
+ <target name="phpcs" description="Check code with PHP Code Sniffer">
+ <exec executable="phpcs">
+  <arg value="-n" />
+  <arg value="--extensions=php" />
+  <arg value="--error-severity=1" />
+  <arg path="${basedir}/app" />
+ </exec>
+</target> 
+
+<!-- Kick off phpunit --> 
+ <target name="phpunit">
+  <echo message="Running PHPUnit ............................... [STARTED]" />
+    <condition property="phpunit-executable" value="${basedir}/vendor/bin/phpunit.bat" else="${basedir}/vendor/bin/phpunit">
+    <and>
+      <os family="windows"/>
+    </and>
+  </condition>
+  <echo message="Environment is ${os.name} therefore executable set to ${phpunit-executable}." />
+  <exec dir="${basedir}" executable="${phpunit-executable}" failonerror="false" description="Run unit app with PHPUnit">
+    <arg value="--verbose" />
+    <arg value="--coverage-html=${location.build.phpunit}" />
+  </exec>
+  <echo message="Running PHPUnit ............................... [COMPLETE]" />
+ </target>
+
+  <target name="phpunit-dev">
+  <echo message="Running PHPUnit ............................... [STARTED]" />
+    <condition property="phpunit-executable" value="${basedir}/vendor/bin/phpunit.bat" else="${basedir}/vendor/bin/phpunit">
+    <and>
+      <os family="windows"/>
+    </and>
+  </condition>
+  <echo message="Environment is ${os.name} therefore executable set to ${phpunit-executable}." />
+  <exec dir="${basedir}" executable="${phpunit-executable}" failonerror="false" description="Run unit app with PHPUnit">
+    <arg value="--verbose" /> 
+    <arg value="--coverage-html=${location.build.phpunit}" />
+  </exec>
+  <echo message="Running PHPUnit ............................... [COMPLETE]" />
+ </target>
+
+</project>

@@ -30,3 +30,5 @@ Route::get('test_crawler', 'CrawlersController@test_crawler');
 Route::get('crawler_test_specific_page', 'CrawlersController@crawler_test_specific_page');
 
 Route::get('process_crawler_queue', 'CrawlersController@process_crawler_queue');
+
+Route::get('cron', 'CronController@cron_main');

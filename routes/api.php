@@ -23,4 +23,8 @@ Route::middleware('api')->get('/get_queue_stats', 'CrawlersController@get_queue_
 
 Route::middleware('api')->post('/load_template', 'JSTemplateController@load_template');
 
-Route::middleware('api')->get('/crawler-queue/get', 'CrawlerApiController@queue_get');
+Route::middleware('api')->post('/crawler/history/check', 'CrawlerApiController@history_check');
+Route::middleware('api')->post('/crawler/history/add', 'CrawlerApiController@history_add');
+
+Route::middleware('api')->get('/crawler/authorisation/request', 'CrawlerApiController@authorisation_request');
+Route::middleware('api')->post('/crawler/status/update', 'CrawlerApiController@status_update');

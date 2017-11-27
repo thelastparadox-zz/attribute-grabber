@@ -31,13 +31,19 @@ class CronController extends Controller
 
             $status = $this->check_status($token);
 
-            //var_dump($status); exit;
+            //var_dump($status); 
+            //var_dump(property_exists($status, "error_code"));
+            //exit;
 
-            if (property_exists('status', 'error_code'))
+            if (property_exists($status, 'error_code'))
             {
                 if ($status->error_code == "INVALID_AUTH_CODE")
                 {
                     Storage::disk('local')->delete('config/autorisation.token');
+                }
+                else
+                {
+                    echo $status->error_code.": ".$status->error_message;
                 }
             }
             else
@@ -75,7 +81,12 @@ class CronController extends Controller
             }
             else
             {
-                return "Issue with interface. Error: ".$res->getStatusCode()."<br>".$res->getBody();
+                $return = new \stdClass();
+                
+                $return->error_message = "Interface returned a status code of ".$res->getStatusCode();
+                $return->error_code = "INTERFACE_ERROR";
+                
+                return $return;
             }      
         }
         else
@@ -91,7 +102,7 @@ class CronController extends Controller
         try {
             $res = $client->request('GET', $this->api_host."/api/crawler/authorisation/request");
         } catch (RequestException $e) {
-            echo "Error"; exit; //$e->getRequest();
+            echo "Error"."\r\n"; exit; //$e->getRequest();
         }
         
         if (!isset($e))
@@ -109,12 +120,12 @@ class CronController extends Controller
                 }
                 else
                 {
-                    echo 'Nothing to do yet (not authorised).';
+                    echo 'Nothing to do yet (awaiting authorisation from server).'."\r\n";
                 }
             }
             else
             {
-                echo 'Theres some kind of error with the interface.\n\n'.$res->getBody();
+                echo 'Theres some kind of error with the interface.\n\n'.$res->getBody()."\r\n";
             }      
         }
     }

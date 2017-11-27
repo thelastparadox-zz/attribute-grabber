@@ -26,8 +26,6 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call('App\Http\Controllers\CronController@cron_main')
                   ->everyMinute();
-
-        $schedule->exec('touch hello.txt')->daily();
     }
 
     /**

@@ -24,8 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controllers\CronController@cron')
+        $schedule->call('App\Http\Controllers\CronController@cron_main')
                   ->everyMinute();
+
+        $schedule->exec('touch hello.txt')->daily();
     }
 
     /**

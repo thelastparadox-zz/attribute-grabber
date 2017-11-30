@@ -26,5 +26,12 @@ Route::middleware('api')->post('/load_template', 'JSTemplateController@load_temp
 Route::middleware('api')->post('/crawler/history/check', 'CrawlerApiController@history_check');
 Route::middleware('api')->post('/crawler/history/add', 'CrawlerApiController@history_add');
 
+Route::middleware('api')->post('/crawler/sites/get', 'CrawlerApiController@sites_info_get');
+Route::middleware('api')->post('/crawler/sites/pages/get', 'CrawlerApiController@sites_pages_get');
+Route::middleware('api')->post('/crawler/sites/pages/avoid', 'CrawlerApiController@sites_pages_avoid_get');
+Route::middleware('api')->post('/crawler/sites/pages/items', 'CrawlerApiController@sites_pages_items_get');
+
 Route::middleware('api')->get('/crawler/authorisation/request', 'CrawlerApiController@authorisation_request');
-Route::middleware('api')->post('/crawler/status/update', 'CrawlerApiController@status_update');
+Route::middleware('api')->get('/crawler/status/update', 'CrawlerApiController@status_update');
+
+Route::middleware('api')->post('/category/save', 'CrawlerApiController@category_save');

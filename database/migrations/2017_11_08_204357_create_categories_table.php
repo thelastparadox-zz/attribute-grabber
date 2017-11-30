@@ -17,7 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->increments('id');
             $table->string('site_id');
             $table->string('category_name');
-            $table->string('category_id'); 
+            $table->string('category_id')->nullable(); 
             $table->string('breadcrumbs');
             $table->string('url')->nullable();
             $table->integer('total_products')->nullable();

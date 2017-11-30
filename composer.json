@@ -14,6 +14,7 @@
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.5",
+        "nesbot/carbon": "^1.22",
         "paquettg/php-html-parser": "^1.7",
         "php-amqplib/php-amqplib": "^2.7",
         "phpoffice/phpspreadsheet": "dev-develop",

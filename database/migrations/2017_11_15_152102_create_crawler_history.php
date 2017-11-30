@@ -16,8 +16,8 @@ class CreateCrawlerHistory extends Migration
         Schema::create('crawler_history', function (Blueprint $table) {
             $table->increments('id');
             $table->string('url');
-            $table->string('raw_output');
-            $table->dateTime('crawler_id');
+            $table->integer('site_id');
+            $table->integer('crawler_id');
             $table->dateTime('crawled_at');
         });
     }
